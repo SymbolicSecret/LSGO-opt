@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 
 class Benchmark(object):
@@ -14,8 +15,8 @@ class Benchmark(object):
             self.lb = -32
         else:
             raise ValueError("Error: The test function is not in this suite!")
-
-        self.x_opt = np.loadtxt('./cdatafiles/F%d-xopt.txt' % index)
+        module_path = os.path.dirname(__file__)
+        self.x_opt = np.loadtxt(module_path + '\cdatafiles\F%d-xopt.txt' % index)
         self.alpha = 10
         self.beta = 0.2
         self.m = 5
@@ -29,12 +30,12 @@ class Benchmark(object):
             if index == 12 or index == 15:
                 pass
             else:
-                self.s = np.loadtxt('./cdatafiles/F%d-s.txt' % index)
-                self.r25 = np.loadtxt('./cdatafiles/F%d-R25.txt' % index, delimiter=',')
-                self.r50 = np.loadtxt('./cdatafiles/F%d-R50.txt' % index, delimiter=',')
-                self.r100 = np.loadtxt('./cdatafiles/F%d-R100.txt' % index, delimiter=',')
-                self.w = np.loadtxt('./cdatafiles/F%d-w.txt' % index)
-                self.p = np.loadtxt('./cdatafiles/F%d-p.txt' % index)
+                self.s = np.loadtxt(module_path + './cdatafiles/F%d-s.txt' % index)
+                self.r25 = np.loadtxt(module_path + './cdatafiles/F%d-R25.txt' % index, delimiter=',')
+                self.r50 = np.loadtxt(module_path + './cdatafiles/F%d-R50.txt' % index, delimiter=',')
+                self.r100 = np.loadtxt(module_path + './cdatafiles/F%d-R100.txt' % index, delimiter=',')
+                self.w = np.loadtxt(module_path + './cdatafiles/F%d-w.txt' % index)
+                self.p = np.loadtxt(module_path + './cdatafiles/F%d-p.txt' % index)
 
     @staticmethod
     def _sphere(x):
