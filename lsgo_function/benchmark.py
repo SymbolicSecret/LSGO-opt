@@ -31,18 +31,21 @@ class Benchmark(object):
                 pass
             else:
                 self.s = np.loadtxt(module_path + './cdatafiles/F%d-s.txt' % index)
-                self.r25 = np.loadtxt(module_path + './cdatafiles/F%d-R25.txt' % index, delimiter=',')
-                self.r50 = np.loadtxt(module_path + './cdatafiles/F%d-R50.txt' % index, delimiter=',')
-                self.r100 = np.loadtxt(module_path + './cdatafiles/F%d-R100.txt' % index, delimiter=',')
+                self.rota_mat_25 = np.loadtxt(module_path + './cdatafiles/F%d-R25.txt' % index, delimiter=',')
+                self.rota_mat_50 = np.loadtxt(module_path + './cdatafiles/F%d-R50.txt' % index, delimiter=',')
+                self.rota_mat_100 = np.loadtxt(module_path + './cdatafiles/F%d-R100.txt' % index, delimiter=',')
+                self.p = np.loadtxt(module_path + './cdatafiles/F%d-p.txt' % index, delimiter=',', dtype=np.int)
+                self.p = self.p - 1
                 self.w = np.loadtxt(module_path + './cdatafiles/F%d-w.txt' % index)
-                self.p = np.loadtxt(module_path + './cdatafiles/F%d-p.txt' % index)
+
+
 
     @staticmethod
     def _sphere(x):
         return np.dot(x, x)
 
     @staticmethod
-    def _dlliptic(x):
+    def _elliptic(x):
         f = 1e6 ** np.linspace(0, 1, x.size)
         return np.dot(f, x ** 2)
 
@@ -97,31 +100,33 @@ class Benchmark(object):
         return x - x_opt
 
     def f1(self, x):
-        return _ellipsis(_t_osz(_shift(x, self.x_opt)))
+        return self._elliptic(self._t_osz(self._shift(x, self.x_opt)))
 
     def f2(self, x):
-        mat = _t_diag(x, self.alpha)
-        return _rastrigin(np.dot(mat, _t_asy(_t_osz(_shift(x, self.x_opt)), self.beta)))
+        mat = self._t_diag(x, self.alpha)
+        return self._rastrigin(np.dot(mat, self._t_asy((self._shift(x, self.x_opt)), self.beta)))
 
     def f3(self, x):
-        mat = _t_diag(x, self.alpha)
-        return _ackley(np.dot(mat, _t_asy(_t_osz(shift(x, self.x_opt)), self.beta)))
+        mat = self._t_diag(x, self.alpha)
+        return self._ackley(np.dot(mat, self._t_asy(self._t_osz(self._shift(x, self.x_opt)), self.beta)))
 
     def f4(self, x):
-        z = _t_osz(_shift(x, self.x_opt))
+        z = self._t_osz(self._shift(x, self.x_opt))
         count = 0
         fit = 0
         for i in range(self.s.size - 1):
             if self.s[i] == 25:
-                fit += self.w[i] * _elliptic(np.dot(self.rota_mat_25, z[self.p[count:count + 25]]))
+                fit += self.w[i] *self._elliptic(np.dot(self.rota_mat_25, z[self.p[count:count + 25]]))
                 count += 25
             elif self.s[i] == 50:
-                fit += self.w[i] * _elliptic(np.dot(self.rota_mat_50, z[self.p[count:count + 50]]))
+                a = self.p[count:count + 25]
+
+                fit = fit + self.w[i] * self._elliptic(np.dot(self.rota_mat_50, z[self.p[count:count + 50]]))
                 count += 50
             else:
-                fit += self.w[i] * _elliptic(np.dot(self.rota_mat_100, z[self.p[count:count + 100]]))
+                fit += self.w[i] *self._elliptic(np.dot(self.rota_mat_100, z[self.p[count:count + 100]]))
                 count += 100
-        fit += _elliptic(z[self.p[count:]])
+        fit += self._elliptic(z[self.p[count:]])
         return fit
 
     # 7-nonseparable, 1-separable shifted and rotated rastrigin's function
